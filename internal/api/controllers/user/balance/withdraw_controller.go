@@ -41,7 +41,7 @@ func (c *WithdrawalsController) CreateRoutes(r *api.Router) []*api.Route {
 
 type createWithdrawInput struct {
 	Number string  `json:"order" binding:"required,luhnablenumber"`
-	Amount float64 `json:"sum" binding:"required,gte=0,lte=4.94065645841246544176568792868221372365059802614325e-324"`
+	Amount float64 `json:"sum" binding:"required,gte=0,lte=999999999999"`
 }
 
 func (cntr *WithdrawalsController) createWithdrawHandler(c *gin.Context) {
@@ -49,6 +49,7 @@ func (cntr *WithdrawalsController) createWithdrawHandler(c *gin.Context) {
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		cntr.lg.ErrorCtx(c, "invalid request params", zap.Error(err))
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
 	}
 
 	current_user := c.GetString(api.CurrentUserIDKey)
