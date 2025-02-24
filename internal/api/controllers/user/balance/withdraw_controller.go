@@ -41,7 +41,7 @@ func (c *WithdrawalsController) CreateRoutes(r *api.Router) []*api.Route {
 
 type createWithdrawInput struct {
 	Number string  `json:"order" binding:"required,luhnablenumber"`
-	Amount float64 `json:"sum" binding:"required"`
+	Amount float64 `json:"sum" binding:"required,gte=0,lte=4.94065645841246544176568792868221372365059802614325e-324"`
 }
 
 func (cntr *WithdrawalsController) createWithdrawHandler(c *gin.Context) {
