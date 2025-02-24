@@ -1,0 +1,31 @@
+x-app: &app
+  labels:
+    logging: "promtail"
+    logging_jobname: "containerlogs"
+  tty: true
+  stdin_open: true
+
+services:
+  gophermart-portal-api:
+    <<: *app
+    container_name: gophermart-portal-api
+    build:
+      context: ../
+      dockerfile: .docker/api/Dockerfile
+    environment:
+      - LOG_LEVEL=-1
+      - DATABASE_DSN=postgres://postgres:secret@db:5432/gophermart_api_development
+      - HTTP_ADDRESS=0.0.0.0:8000
+      - BILLING_ORDERS_ADDRESS=gophermart-billing_sync_commands:8010
+      - BILLING_ACCOUNTING_ADDRESS=gophermart-billing_sync_commands:8020
+      - QUERY_ORDERS_ADDRESS=gophermart-query-server:8030
+      - QUERY_ACCOUNTING_ADDRESS=gophermart-query-server:8040
+      - IAM_TOKEN_TTL=600
+    env_file:
+      - api/.env
+    ports:
+      - 8000:8000
+
+networks:
+  default:
+    name: gophermart-network
