@@ -8,10 +8,13 @@ import (
 	"github.com/vysogota0399/gophermart_portal/internal/api/logging"
 	"github.com/vysogota0399/gophermart_portal/internal/config"
 	billing "github.com/vysogota0399/gophermart_protos/gen/commands/create_order"
+	"github.com/vysogota0399/gophermart_protos/gen/common"
+	"github.com/vysogota0399/gophermart_protos/gen/entities"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type BillingOrdersRpcClient struct {
@@ -50,11 +53,11 @@ func (rpc *BillingOrdersRpcClient) CreateOrder(ctx context.Context, in *NewOrder
 	ctx = rpc.lg.WithContextFields(ctx, zap.String("actor", "billing_rpc_client"))
 	rpc.lg.DebugCtx(ctx, "remote billing call CreateOrder", zap.Any("order", in))
 
-	message := &billing.NewOrder{
-		Uuid:       in.UUID,
+	message := &billing.CreateNewOrderParams{
+		Uuid:       &common.Uuid{Value: in.UUID},
 		Number:     in.Number,
-		UploadedAt: in.UploadedAt.Format(time.RFC3339Nano),
-		AccountId:  in.AccountID,
+		UploadedAt: timestamppb.New(in.UploadedAt),
+		Account:    &entities.Account{Id: in.AccountID},
 	}
 
 	rpc.lg.DebugCtx(ctx, "create order", zap.Any("order", message))

@@ -3,10 +3,12 @@ package clients
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/vysogota0399/gophermart_portal/internal/api/logging"
 	"github.com/vysogota0399/gophermart_portal/internal/api/models"
 	"github.com/vysogota0399/gophermart_portal/internal/config"
+	"github.com/vysogota0399/gophermart_protos/gen/entities"
 	query "github.com/vysogota0399/gophermart_protos/gen/queries/orders"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -45,8 +47,10 @@ func (rpc *QueryOrdersRpcClient) OrdersCollection(ctx context.Context, accountID
 
 	response, err := rpc.query.OrdersCollection(
 		ctx,
-		&query.QueryOrdersParams{
-			AccountId: accountID,
+		&query.QueryOrdersRequest{
+			Account: &entities.Account{
+				Id: accountID,
+			},
 		},
 	)
 
@@ -61,12 +65,25 @@ func (rpc *QueryOrdersRpcClient) OrdersCollection(ctx context.Context, accountID
 			orders,
 			&models.Order{
 				Number:     o.Number,
-				State:      o.State,
-				Accrual:    o.Accrual,
-				UploadedAt: o.UploadedAt,
+				Status:     OrderStatusPresenter(o.State),
+				Accrual:    float64(o.Accrual.Units) / 100,
+				UploadedAt: o.UploadedAt.AsTime().Format(time.RFC3339Nano),
 			},
 		)
 	}
 
 	return orders, nil
+}
+
+func OrderStatusPresenter(s entities.OrderStates) string {
+	switch s {
+	case entities.OrderStates_ORDER_STATES_INVALID:
+		return "INVALID"
+	case entities.OrderStates_ORDER_STATES_PROCESSED:
+		return "PROCESSED"
+	case entities.OrderStates_ORDER_STATES_PROCESSING:
+		return "PROCESSING"
+	default:
+		return "REGISTERED"
+	}
 }

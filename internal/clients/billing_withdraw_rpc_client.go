@@ -8,7 +8,6 @@ import (
 	"github.com/vysogota0399/gophermart_portal/internal/config"
 	billing "github.com/vysogota0399/gophermart_protos/gen/commands/withdraw"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -48,11 +47,8 @@ func (rpc *BillingWithdrawRpcClient) Withdraw(ctx context.Context, accountID int
 	rpc.lg.DebugCtx(
 		ctx,
 		"do withdraw",
-		zap.String("method", "DoWithdraw"),
-		zap.String("service", "billing"),
-		zap.Any("params", params),
+		params,
 	)
-
 	_, err := rpc.billing.DoWithdraw(ctx, params)
 	if err != nil {
 		return fmt.Errorf("billing_accounting_rpc_client billing billing balance error %w", err)
