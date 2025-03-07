@@ -21,7 +21,7 @@ type WithdrawalsController struct {
 }
 
 type WithdrawRpcService interface {
-	Withdraw(ctx context.Context, accountID int64, amount float64, orderNumber string) error
+	DoWithdraw(ctx context.Context, accountID int64, amount float64, orderNumber string) error
 }
 
 func NewWithdrawalsController(billing WithdrawRpcService, lg *logging.ZapLogger) *WithdrawalsController {
@@ -66,7 +66,7 @@ func (cntr *WithdrawalsController) createWithdrawHandler(c *gin.Context) {
 		return
 	}
 
-	if err := cntr.billing.Withdraw(ctx, accountID, payload.Amount, payload.Number); err != nil {
+	if err := cntr.billing.DoWithdraw(ctx, accountID, payload.Amount, payload.Number); err != nil {
 		if status.Code(err) == codes.Aborted {
 			s := status.Convert(err)
 			for _, d := range s.Details() {

@@ -52,8 +52,8 @@ func (rpc *QueryAccountingRpcClient) GetBalance(ctx context.Context, accountID i
 	}
 
 	return &models.Balance{
-		Current:   float64(response.Balance.Units) / 100,
-		Withdrawn: float64(response.Withdrawn.Units) / 100,
+		Current:   amount.New(response.Balance).Float64(),
+		Withdrawn: amount.New(response.Withdrawn).Float64(),
 	}, nil
 }
 
