@@ -10,6 +10,7 @@ import (
 	"github.com/vysogota0399/gophermart_portal/internal/config"
 	"github.com/vysogota0399/gophermart_protos/gen/entities"
 	query "github.com/vysogota0399/gophermart_protos/gen/queries/accounting"
+	"github.com/vysogota0399/gophermart_protos/utils/amount"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -72,7 +73,7 @@ func (rpc *QueryAccountingRpcClient) GetWithdrawals(ctx context.Context, account
 			windrawals,
 			&models.Withdraw{
 				OrderNumber: w.OrderNumber,
-				Sum:         float64(w.Sum.Units) / 100,
+				Sum:         amount.New(w.Sum).Float64(),
 				ProcessedAt: w.ProcessedAt.AsTime().Format(time.RFC3339Nano),
 			},
 		)

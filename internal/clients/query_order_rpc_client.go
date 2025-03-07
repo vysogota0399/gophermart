@@ -10,6 +10,7 @@ import (
 	"github.com/vysogota0399/gophermart_portal/internal/config"
 	"github.com/vysogota0399/gophermart_protos/gen/entities"
 	query "github.com/vysogota0399/gophermart_protos/gen/queries/orders"
+	"github.com/vysogota0399/gophermart_protos/utils/amount"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -66,7 +67,7 @@ func (rpc *QueryOrdersRpcClient) OrdersCollection(ctx context.Context, accountID
 			&models.Order{
 				Number:     o.Number,
 				Status:     OrderStatusPresenter(o.State),
-				Accrual:    float64(o.Accrual.Units) / 100,
+				Accrual:    amount.New(o.Accrual).Float64(),
 				UploadedAt: o.UploadedAt.AsTime().Format(time.RFC3339Nano),
 			},
 		)
